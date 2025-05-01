@@ -18,7 +18,7 @@ import { confirmationDialog } from './helper.js';
  *
  * @options Options:
  * - `--ignore <deps>`: Comma-separated list of dependencies to exclude from reporting.
- * - `--delete`: Automatically uninstall unused dependencies by confirmation.
+ * - `--clean`: Automatically uninstall unused dependencies by confirmation.
  * - `--all`: In combination with `--delete`-flag to remove *all* unused dependencies.
  * - `--yes`: Skip confirmation prompts before uninstalling.
  */
@@ -26,12 +26,12 @@ program
   .command('scan')
   .description('Scan project for unused dependencies.')
   .option('--ignore <deps>', 'Comma-separated list of dependencies to ignore.')
-  .option('--delete', 'Automatically remove all unused dependencies.')
+  .option('--clean <deps>', 'Automatically remove all unused dependencies.')
   .option(
     '--all',
-    'In combination with --delete, removes all unused dependencies.',
+    'In combination with --clean it removes all unused dependencies.',
   )
-  .option('--yes', 'Skip confirmation prompt when using --delete.')
+  .option('--yes', 'Skips confirmation dialog when deleting by using --yes.')
   .action(async (options) => {
     const rootDir = process.cwd();
 
@@ -56,8 +56,8 @@ program
 
     console.log(chalk.yellow('Unused dependencies:'), unused.join(', '));
 
-    // Handle deletion
-    if (options.delete) {
+    // Handle Cleanup
+    if (options.clean) {
       if (!options.yes) {
         const confirm = await confirmationDialog(
           options.all
