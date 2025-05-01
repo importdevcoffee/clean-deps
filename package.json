@@ -1,0 +1,29 @@
+{
+  "name": "clean-deps",
+  "version": "1.0.0",
+  "description": "clean-deps is a CLI tool for detecting and removing unused dependencies with optional flags.",
+  "license": "ISC",
+  "author": "importdevcoffee",
+  "type": "module",
+  "main": "src/clean-deps.js",
+  "scripts": {
+    "scan": "node src/clean-deps scan",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "prettier": "npx prettier src --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "prepare": "npm run lint && npm run prettier"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.1",
+    "eslint": "^9.25.1",
+    "globals": "^16.0.0",
+    "prettier": "3.5.3"
+  },
+  "dependencies": {
+    "acorn": "^8.14.1",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "fast-glob": "^3.3.3"
+  }
+}

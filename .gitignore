@@ -1,0 +1,34 @@
+# Node.js & npm
+node_modules/
+package-lock.json
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.npmrc
+
+# Coverage reports (if you're using testing frameworks)
+coverage/
+
+# IDEs & Editors
+.idea/
+.vscode/
+.history
+*.swp
+*.swo
+
+# Build files
+dist/
+build/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store  # macOS specific
+Thumbs.db  # Windows specific
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
