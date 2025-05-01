@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import readline from 'readline';
 /**
  * This function provides an easy way to get a confirmation of the user, by asking a simple yes/no question, within the terminal.
  *
