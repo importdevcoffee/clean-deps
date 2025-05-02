@@ -1,22 +1,24 @@
+#!/usr/bin/env node
+
 import { program } from 'commander';
 import { execSync } from 'child_process';
-import { scanImports } from './scanner.js';
+import { scanImports } from '../src/scanner.js';
 import {
   findUnusedDependencies,
   findUsedDependenciesFromScripts,
-} from './analyzer.js';
+} from '../src/analyzer.js';
 import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
-import { confirmationDialog } from './helper.js';
+import { confirmationDialog, checkDepsExist } from '../src/helper.js';
 
 /**
- * @command scan - Scans the current project for unused dependencies.
+ * Command: scan - Scans the current project for unused dependencies.
  *
  * Analyzes JavaScript/TypeScript imports and `package.json` scripts
  * to detect declared dependencies that are never used in the codebase.
  *
- * @options Options:
+ * Options (Flags):
  * - `--ignore <deps>`: Comma-separated list of dependencies to exclude from reporting.
  * - `--clean`: Automatically uninstall unused dependencies by confirmation.
  * - `--all`: In combination with `--delete`-flag to remove *all* unused dependencies.
@@ -26,12 +28,15 @@ program
   .command('scan')
   .description('Scan project for unused dependencies.')
   .option('--ignore <deps>', 'Comma-separated list of dependencies to ignore.')
-  .option('--clean <deps>', 'Automatically remove all unused dependencies.')
+  .option('-c, --clean', 'Removes all unused dependencies after confirmation.')
   .option(
-    '--all',
+    '-s, --specify <deps>',
     'In combination with --clean it removes all unused dependencies.',
   )
-  .option('--yes', 'Skips confirmation dialog when deleting by using --yes.')
+  .option(
+    '-y, --yes',
+    'Skips confirmation dialog when deleting by using --yes.',
+  )
   .action(async (options) => {
     const rootDir = process.cwd();
 
@@ -40,27 +45,52 @@ program
     const imports = await scanImports(rootDir);
     const usedDependencies = new Set([...usedFromScripts, ...imports]);
 
+    console.log('Dependencies from script and imports which are in use:\n', [
+      ...usedDependencies,
+    ]);
+
     let unused = await findUnusedDependencies(usedDependencies, rootDir);
 
-    // Apply based on ignore flag, filter out of the unused.
+    if (options.ignore && options.specify) {
+      console.warn(
+        '⚠️ Both --ignore and --specify provided. --specify will take precedence.',
+      );
+    }
+
+    // Based on ignore flag, filter out of the string[] the unused.
     if (options.ignore) {
       const ignored = options.ignore.split(',').map((d) => d.trim());
+      checkDepsExist(ignored, unused, 'Specified');
+
       unused = unused.filter((dep) => !ignored.includes(dep));
     }
 
-    // Report unused dependencies
+    //When specify flag is being used, keep only the specified in unused as a string[].
+    if (options.specify) {
+      const specified = options.specify
+        .split(',')
+        .map((d) => d.trim().toLowerCase());
+
+      console.log('Unused dependencies:', unused);
+      checkDepsExist(specified, unused, 'Specified');
+
+      unused = specified;
+    }
+
+    // Report to the user that there are no unused dependencies
     if (unused.length === 0) {
+      console.log('Unused: ', unused);
       console.log(chalk.green(`Found ${unused.length} unused dependencies.`));
       return;
     }
 
-    console.log(chalk.yellow('Unused dependencies:'), unused.join(', '));
+    console.log(chalk.yellow('Unused dependencies:'), [unused.join(', ')]);
 
     // Handle Cleanup
     if (options.clean) {
       if (!options.yes) {
         const confirm = await confirmationDialog(
-          options.all
+          options.specify
             ? 'Are you sure you want to uninstall all unused dependencies?'
             : `Are you sure you want to uninstall ${unused.length} unused dependencies?`,
         );
@@ -85,7 +115,9 @@ program
       try {
         execSync(uninstallCmd, { stdio: 'inherit', cwd: rootDir });
         console.log(
-          chalk.red(`Successfully removed ${unused.length} dependencies.`),
+          chalk.red(
+            `Successfully removed ${unused.length} dependencies. Removed dependency list: ${unused}`,
+          ),
         );
       } catch (err) {
         console.error(
