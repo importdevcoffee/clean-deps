@@ -60,7 +60,7 @@ program
     // Based on ignore flag, filter out of the string[] the unused.
     if (options.ignore) {
       const ignored = options.ignore.split(',').map((d) => d.trim());
-      checkDepsExist(ignored, unused, 'Specified');
+      checkDepsExist(ignored, unused, 'Ignored');
 
       unused = unused.filter((dep) => !ignored.includes(dep));
     }
