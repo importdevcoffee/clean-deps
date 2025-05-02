@@ -44,7 +44,34 @@ export async function scanImports(rootDir) {
         node.declarations[0].init.type === 'CallExpression' &&
         node.declarations[0].init.callee.name === 'require'
       ) {
-        imported.add(node.declarations[0].init.arguments[0].value);
+        const arg = node.declarations[0].init.arguments[0];
+        if (arg && typeof arg.value === 'string') {
+          imported.add(arg.value);
+        }
+      }
+
+      if (
+        node.type === 'ExpressionStatement' &&
+        node.expression.type === 'CallExpression' &&
+        node.expression.callee.type === 'MemberExpression' &&
+        node.expression.callee.object.type === 'CallExpression' &&
+        node.expression.callee.object.callee.name === 'require'
+      ) {
+        const arg = node.expression.callee.object.arguments[0];
+        if (arg && typeof arg.value === 'string') {
+          imported.add(arg.value);
+        }
+      }
+
+      if (
+        node.type === 'ExpressionStatement' &&
+        node.expression.type === 'CallExpression' &&
+        node.expression.callee.name == 'require'
+      ) {
+        const arg = node.expression.arguments[0];
+        if (arg && typeof arg.value === 'string') {
+          imported.add(arg.value);
+        }
       }
     }
   }
