@@ -1,4 +1,6 @@
 import { loadPackageJson } from './helper.js';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Analyzes declared dependencies in `package.json` and returns those not present
@@ -43,14 +45,55 @@ function findUsedDependenciesFromScripts(rootDir) {
     ...pkg.devDependencies,
   };
 
-  // Checking each script for dependencies
-  Object.values(scripts).forEach((script) => {
-    // Looping through all dependencies and checking if they appear in any script
-    Object.keys(allDeps).forEach((dep) => {
-      if (script.includes(dep)) {
-        usedDeps.add(dep); // Now mark dependency as used if it's mentioned in the script
+  const binMap = new Map(); // Map<binaryName, depName>
+
+  //Resolving the path of package.json of each dep in node_modules
+  for (const depName of Object.keys(allDeps)) {
+    const depPkgPath = path.join(
+      rootDir,
+      'node_modules',
+      depName, //includes scoped packages, like @orgname/package-name
+      'package.json',
+    );
+
+    if (fs.existsSync(depPkgPath)) {
+      try {
+        const depPkg = JSON.parse(fs.readFileSync(depPkgPath, 'utf-8'));
+        const binField = depPkg.bin;
+
+        // There are two common ways in a package.json which needs to be handled.
+        // e.g., "bin": "dep_name_string" and "bin": {"binKey": "binValue"}
+        //if bin field is a string (single binary), map to package-name
+        //if bin field is an object (multiple binaries), map each bin-name to package
+        if (typeof binField === 'string') {
+          binMap.set(depName, depName);
+        } else if (typeof binField === 'object') {
+          for (const [binName] of Object.entries(binField)) {
+            binMap.set(binName, depName);
+          }
+        }
+      } catch {
+        //If reading package.json fails, skipping this dep.
       }
-    });
+    }
+  }
+
+  //for each script in package.json, check if any bin name is referenced
+  Object.values(scripts).forEach((script) => {
+    for (const [binName, depName] of binMap.entries()) {
+      if (script.includes(binName)) {
+        //if script includes bin name, mark corresponding dependency as used
+        usedDeps.add(depName);
+      }
+    }
+
+    //checking for any declared dependency appearing directly in scripts
+    for (const depName of Object.keys(allDeps)) {
+      if (script.includes(depName)) {
+        //if script includes then dep-name will be marked as used
+        usedDeps.add(depName);
+      }
+    }
   });
 
   return usedDeps;
