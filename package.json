@@ -1,11 +1,14 @@
 {
   "name": "clean-deps",
-  "version": "1.0.0",
+  "version": "0.9.0",
   "description": "clean-deps is a CLI tool for detecting and removing unused dependencies with optional flags.",
   "license": "ISC",
   "author": "importdevcoffee",
   "type": "module",
   "main": "src/clean-deps.js",
+  "publishConfig": {
+    "access": "restricted"
+  },
   "scripts": {
     "scan": "node src/clean-deps scan",
     "lint": "eslint src",
