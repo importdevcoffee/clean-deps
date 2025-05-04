@@ -32,3 +32,6 @@ jobs:
 
       - name: Dependency scan
         run: npm run scan
+
+      - name: Run tests
+        run: npm run test
