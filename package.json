@@ -5,6 +5,12 @@
   "license": "MIT",
   "type": "module",
   "main": "bin/clean-deps.js",
+  "files": [
+    "bin/",
+    "src/",
+    "package.json",
+    "README.md"
+  ],
   "bin": {
     "clean-deps": "./bin/clean-deps.js"
   },
@@ -18,8 +24,8 @@
   "private": false,
   "keywords": [
     "dependencies",
-    "unused dependencis",
-    "cleanup tool",
+    "unused-dependencis",
+    "cleanup-tool",
     "cli-tool",
     "cmd",
     "command-line",
@@ -32,7 +38,7 @@
     "prettier": "npx prettier src --check",
     "prettier:fix": "npm run prettier -- --write",
     "test": "vitest",
-    "prepare": "npm run lint && npm run prettier"
+    "prepare": "npm run lint && npm run prettier && npm run scan"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.1",

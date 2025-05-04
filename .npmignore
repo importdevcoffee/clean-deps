@@ -1,0 +1,23 @@
+#Ignore dev folders
+.github/
+tests/
+node_modules/
+
+#Ignore config files
+eslint.config.mjs
+.prettierrc
+.prettierignore
+.gitignore
+
+#Ignore logs
+*.log
+*.tsbuildinfo
+
+#Ignore editor settings
+.idea/
+.vscode/
+.history
+
+#Ignore test files
+**/*.test.js
+
