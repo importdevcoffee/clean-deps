@@ -9,7 +9,8 @@
     "bin/",
     "src/",
     "package.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "bin": {
     "clean-deps": "./bin/clean-deps.js"
