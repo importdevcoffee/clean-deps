@@ -1,6 +1,6 @@
 {
   "name": "@importdevcoffee/clean-deps",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "clean-deps is a CLI tool for detecting and removing unused dependencies with optional flags.",
   "license": "MIT",
   "type": "module",
@@ -20,12 +20,14 @@
     "url": "https://github.com/importdevcoffee"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "private": false,
   "keywords": [
+    "dependency",
     "dependencies",
     "unused-dependencis",
+    "cleaner",
     "cleanup-tool",
     "cli-tool",
     "cmd",
